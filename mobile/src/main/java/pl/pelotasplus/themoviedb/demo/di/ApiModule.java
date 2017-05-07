@@ -1,5 +1,8 @@
 package pl.pelotasplus.themoviedb.demo.di;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import javax.inject.Named;
 
 import dagger.Module;
@@ -8,6 +11,7 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import pl.pelotasplus.themoviedb.demo.BuildConfig;
+import pl.pelotasplus.themoviedb.demo.MyTypeAdapterFactory;
 import pl.pelotasplus.themoviedb.demo.api.AuthInterceptor;
 import pl.pelotasplus.themoviedb.demo.api.TheMovieDatabaseAPI;
 import retrofit2.Retrofit;
@@ -48,10 +52,14 @@ public class ApiModule {
 
     @Provides
     TheMovieDatabaseAPI provideTheMovieDatabaseAPI(OkHttpClient okHttpClient) {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapterFactory(MyTypeAdapterFactory.create())
+                .create();
+
         return new Retrofit.Builder()
                 .baseUrl(BuildConfig.TMDB_API_ENDPOINT)
                 .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build()
                 .create(TheMovieDatabaseAPI.class);
