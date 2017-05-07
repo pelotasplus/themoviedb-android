@@ -1,0 +1,35 @@
+allprojects {
+    buildscript {
+        repositories {
+            mavenCentral()
+            jcenter()
+            maven {
+                url "https://jitpack.io"
+            }
+        }
+
+        dependencies {
+            classpath 'com.android.tools.build:gradle:2.3.1'
+            classpath 'me.tatarka:gradle-retrolambda:3.4.0'
+        }
+    }
+
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven {
+            url "https://jitpack.io"
+        }
+    }
+
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xmaxerrs" << "1000"
+        }
+    }
+}
+
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
