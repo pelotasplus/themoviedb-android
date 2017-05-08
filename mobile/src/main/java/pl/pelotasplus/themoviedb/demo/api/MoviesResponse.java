@@ -15,4 +15,8 @@ public class MoviesResponse extends BaseResponse {
     int totalPages;
 
     List<Movie> results = Collections.emptyList();
+
+    public List<Movie> getResults() {
+        return results;
+    }
 }

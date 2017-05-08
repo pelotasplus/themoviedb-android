@@ -6,21 +6,22 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp">
 
         <TextView
-            android:id="@+id/release_date"
+            android:id="@+id/title"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_marginBottom="0dp"
-            android:layout_marginRight="1dp"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="0dp"
+            android:layout_marginTop="16dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            app:layout_constraintBottom_toBottomOf="@+id/overview"
-            app:layout_constraintRight_toRightOf="@+id/guideline2"
-            app:layout_constraintTop_toTopOf="@+id/title"
-            tools:text="1974" />
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="@+id/guideline"
+            app:layout_constraintRight_toLeftOf="@+id/guideline2"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Rambo" />
 
         <TextView
             android:id="@+id/overview"
@@ -28,43 +29,48 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:layout_marginLeft="0dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginRight="0dp"
             android:layout_marginTop="8dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toLeftOf="@+id/guideline"
-            app:layout_constraintRight_toLeftOf="@+id/release_date"
-            app:layout_constraintTop_toBottomOf="@+id/title"
+            app:layout_constraintRight_toLeftOf="@+id/guideline2"
+            app:layout_constraintTop_toBottomOf="@+id/release_date"
             app:layout_constraintVertical_bias="0.0"
             tools:text="Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum" />
 
         <TextView
-            android:id="@+id/title"
+            android:id="@+id/release_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="0dp"
-            android:layout_marginTop="16dp"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:layout_marginTop="8dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textStyle="italic"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toLeftOf="@+id/guideline"
-            app:layout_constraintRight_toLeftOf="@+id/release_date"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Rambo" />
+            app:layout_constraintRight_toLeftOf="@+id/guideline2"
+            app:layout_constraintTop_toBottomOf="@+id/title"
+            tools:text="1974" />
+
 
         <android.support.constraint.Guideline
             android:id="@+id/guideline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_begin="16dp" />
+            app:layout_constraintGuide_begin="16dp"
+            tools:layout_editor_absoluteX="16dp"
+            tools:layout_editor_absoluteY="0dp" />
 
         <android.support.constraint.Guideline
             android:id="@+id/guideline2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_end="16dp" />
+            app:layout_constraintGuide_end="16dp"
+            tools:layout_editor_absoluteX="368dp"
+            tools:layout_editor_absoluteY="0dp" />
 
     </android.support.constraint.ConstraintLayout>
 </layout>

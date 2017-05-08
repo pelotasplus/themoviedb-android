@@ -16,14 +16,14 @@ public abstract class Movie implements Parcelable {
     }
 
     @SerializedName("poster_path")
-    public abstract String posterPath();
+    abstract String posterPath();
 
     abstract boolean adult();
 
-    abstract String overview();
+    public abstract String overview();
 
     @SerializedName("release_date")
-    abstract String releaseDate();
+    public abstract String releaseDate();
 
     @SerializedName("genre_ids")
     abstract List<Integer> genreIds();
@@ -34,7 +34,7 @@ public abstract class Movie implements Parcelable {
     @SerializedName("original_language")
     abstract String originalLanguage();
 
-    abstract String title();
+    public abstract String title();
 
     abstract float popularity();
 
