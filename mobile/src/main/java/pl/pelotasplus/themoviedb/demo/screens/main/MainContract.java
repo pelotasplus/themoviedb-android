@@ -1,4 +1,4 @@
-package pl.pelotasplus.themoviedb.demo;
+package pl.pelotasplus.themoviedb.demo.screens.main;
 
 import java.util.ArrayList;
 

@@ -16,7 +16,7 @@ public abstract class Movie implements Parcelable {
     }
 
     @SerializedName("poster_path")
-    abstract String posterPath();
+    public abstract String posterPath();
 
     abstract boolean adult();
 

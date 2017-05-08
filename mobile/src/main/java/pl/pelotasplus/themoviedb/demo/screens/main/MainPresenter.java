@@ -1,4 +1,4 @@
-package pl.pelotasplus.themoviedb.demo;
+package pl.pelotasplus.themoviedb.demo.screens.main;
 
 import java.util.ArrayList;
 
@@ -25,15 +25,15 @@ class MainPresenter implements MainContract.Presenter {
         if (savedInstanceState == null) {
             movieObservable = theMovieDatabaseAPI
                     .discoverMovie()
-                    .flatMap(moviesResponse -> Observable.from(moviesResponse.getResults()));
+                    .flatMap(moviesResponse -> Observable.from(moviesResponse.getResults()))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
         } else {
             movieObservable = Observable
                     .from(savedInstanceState);
         }
 
         Subscription sub = movieObservable
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         view::addMovie,
                         Throwable::printStackTrace
