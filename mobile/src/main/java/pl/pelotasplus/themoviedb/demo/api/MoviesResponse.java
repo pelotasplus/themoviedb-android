@@ -14,7 +14,7 @@ public class MoviesResponse extends BaseResponse {
     @SerializedName("total_pages")
     int totalPages;
 
-    List<Movie> results = Collections.emptyList();
+    private List<Movie> results = Collections.emptyList();
 
     public List<Movie> getResults() {
         return results;

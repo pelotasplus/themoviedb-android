@@ -1,5 +1,8 @@
 package pl.pelotasplus.themoviedb.demo;
 
+import java.util.ArrayList;
+
+import pl.pelotasplus.themoviedb.demo.api.Movie;
 import pl.pelotasplus.themoviedb.demo.api.TheMovieDatabaseAPI;
 import rx.Observable;
 import rx.Subscription;
@@ -16,10 +19,19 @@ class MainPresenter implements MainContract.Presenter {
     }
 
     @Override
-    public void bind(MainContract.View view) {
-        Subscription sub = theMovieDatabaseAPI
-                .discoverMovie()
-                .flatMap(moviesResponse -> Observable.from(moviesResponse.getResults()))
+    public void bind(MainContract.View view, ArrayList<Movie> savedInstanceState) {
+        Observable<Movie> movieObservable;
+
+        if (savedInstanceState == null) {
+            movieObservable = theMovieDatabaseAPI
+                    .discoverMovie()
+                    .flatMap(moviesResponse -> Observable.from(moviesResponse.getResults()));
+        } else {
+            movieObservable = Observable
+                    .from(savedInstanceState);
+        }
+
+        Subscription sub = movieObservable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(

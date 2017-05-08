@@ -28,6 +28,8 @@ public abstract class Movie implements Parcelable {
     @SerializedName("genre_ids")
     abstract List<Integer> genreIds();
 
+    public abstract int id();
+
     @SerializedName("original_title")
     abstract String originalTitle();
 

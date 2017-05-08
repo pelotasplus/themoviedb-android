@@ -1,5 +1,7 @@
 package pl.pelotasplus.themoviedb.demo;
 
+import java.util.ArrayList;
+
 import pl.pelotasplus.themoviedb.demo.api.Movie;
 
 interface MainContract {
@@ -8,7 +10,7 @@ interface MainContract {
     }
 
     interface Presenter {
-        void bind(View view);
+        void bind(View view, ArrayList<Movie> savedInstanceState);
 
         void unbind();
     }

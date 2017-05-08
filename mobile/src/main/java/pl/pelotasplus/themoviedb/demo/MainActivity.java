@@ -3,12 +3,12 @@ package pl.pelotasplus.themoviedb.demo;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.util.SortedList;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.util.SortedListAdapterCallback;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
+import java.util.ArrayList;
 
 import pl.pelotasplus.themoviedb.demo.api.Movie;
 import pl.pelotasplus.themoviedb.demo.databinding.ActivityMainBinding;
@@ -16,7 +16,9 @@ import pl.pelotasplus.themoviedb.demo.databinding.ViewMovieRowBinding;
 import pl.pelotasplus.themoviedb.demo.di.AppComponent;
 
 public class MainActivity extends AppCompatActivity implements MainContract.View {
-    private MoviesAdapter moviesAdapter = new MoviesAdapter();
+    private final static String EXTRA_MOVIES_KEY = "MainContract/EXTRA_MOVIES_KEY";
+
+    private final MoviesAdapter moviesAdapter = new MoviesAdapter();
     private MainPresenter presenter;
 
     @Override
@@ -28,11 +30,12 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         binding.recyclerView.setAdapter(moviesAdapter);
 
-        presenter = new MainPresenter(
-                getAppComponent().getTheMovieDatabaseAPI()
-        );
+        presenter = new MainPresenter(getAppComponent().getTheMovieDatabaseAPI());
 
-        presenter.bind(this);
+        presenter.bind(
+                this,
+                savedInstanceState != null ? savedInstanceState.getParcelableArrayList(EXTRA_MOVIES_KEY) : null
+        );
     }
 
     @Override
@@ -43,8 +46,16 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelableArrayList(EXTRA_MOVIES_KEY, moviesAdapter.getMovies());
+    }
+
+    @Override
     public void addMovie(Movie movie) {
         moviesAdapter.addMovie(movie);
+        moviesAdapter.notifyDataSetChanged();
     }
 
     private AppComponent getAppComponent() {
@@ -52,23 +63,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
     private static class MoviesAdapter extends RecyclerView.Adapter<MovieViewHolder> {
-        private final SortedList<Movie> sortedList =
-                new SortedList<>(Movie.class, new SortedListAdapterCallback<Movie>(this) {
-                    @Override
-                    public int compare(Movie o1, Movie o2) {
-                        return o2.releaseDate().compareTo(o1.releaseDate());
-                    }
-
-                    @Override
-                    public boolean areContentsTheSame(Movie oldItem, Movie newItem) {
-                        return oldItem.equals(newItem);
-                    }
-
-                    @Override
-                    public boolean areItemsTheSame(Movie item1, Movie item2) {
-                        return item1 == item2;
-                    }
-                });
+        private ArrayList<Movie> movies = new ArrayList<>();
 
         @Override
         public MovieViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -84,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
         @Override
         public void onBindViewHolder(MovieViewHolder holder, int position) {
-            Movie movie = sortedList.get(position);
+            Movie movie = movies.get(position);
 
             holder.binding.title.setText(movie.title());
             holder.binding.overview.setText(movie.overview());
@@ -93,11 +88,15 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
         @Override
         public int getItemCount() {
-            return sortedList.size();
+            return movies.size();
         }
 
         void addMovie(Movie movie) {
-            sortedList.add(movie);
+            movies.add(movie);
+        }
+
+        ArrayList<Movie> getMovies() {
+            return movies;
         }
     }
 
