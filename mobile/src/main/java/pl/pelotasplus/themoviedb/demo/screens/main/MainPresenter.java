@@ -24,7 +24,10 @@ class MainPresenter implements MainContract.Presenter {
 
         if (savedInstanceState == null) {
             movieObservable = theMovieDatabaseAPI
-                    .discoverMovie()
+                    .discoverMovie(
+                            "2017-05-08",
+                            1
+                    )
                     .flatMap(moviesResponse -> Observable.from(moviesResponse.getResults()))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread());

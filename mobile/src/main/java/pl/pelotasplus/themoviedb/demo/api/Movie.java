@@ -1,6 +1,7 @@
 package pl.pelotasplus.themoviedb.demo.api;
 
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
@@ -15,6 +16,7 @@ public abstract class Movie implements Parcelable {
         return new AutoValue_Movie.GsonTypeAdapter(gson);
     }
 
+    @Nullable
     @SerializedName("poster_path")
     public abstract String posterPath();
 

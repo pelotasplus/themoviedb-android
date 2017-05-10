@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">TheMovieDB Demo</string>
+    <string name="filter">Filter</string>
+    <string name="year_dialog_title">Select Year</string>
+    <string name="year_dialog_message">Show only movies released in a particular year</string>
+    <string name="cancel">Cancel</string>
 </resources>
