@@ -12,6 +12,8 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 import pl.pelotasplus.themoviedb.demo.MobileApplication;
 import pl.pelotasplus.themoviedb.demo.R;
@@ -21,8 +23,10 @@ import pl.pelotasplus.themoviedb.demo.databinding.ViewMovieRowBinding;
 import pl.pelotasplus.themoviedb.demo.di.AppComponent;
 import pl.pelotasplus.themoviedb.demo.screens.details.DetailsActivity;
 
-public class MainActivity extends AppCompatActivity implements MainContract.View {
+public class MainActivity extends AppCompatActivity implements
+        MainContract.View, DatePickerFragment.OnDatePicked {
     private final static String EXTRA_MOVIES_KEY = "MainActivity/EXTRA_MOVIES_KEY";
+    private final static String EXTRA_YEAR_KEY = "MainActivity/EXTRA_YEAR_KEY";
     private final static String EXTRA_LAYOUT_MANAGER_KEY = "MainActivity/EXTRA_LAYOUT_MANAGER_KEY";
 
     private final MoviesAdapter moviesAdapter = new MoviesAdapter();
@@ -38,13 +42,17 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         binding.recyclerView.setAdapter(moviesAdapter);
 
-
         presenter = new MainPresenter(getAppComponent().getTheMovieDatabaseAPI());
 
-        presenter.bind(
-                this,
-                savedInstanceState != null ? savedInstanceState.getParcelableArrayList(EXTRA_MOVIES_KEY) : null
-        );
+        ArrayList<Movie> savedMovies = null;
+        int savedYear = Calendar.getInstance().get(Calendar.YEAR);
+
+        if (savedInstanceState != null) {
+            savedMovies = savedInstanceState.getParcelableArrayList(EXTRA_MOVIES_KEY);
+            savedYear = savedInstanceState.getInt(EXTRA_YEAR_KEY);
+        }
+
+        presenter.bind(this, savedMovies, savedYear);
     }
 
     @Override
@@ -67,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
         outState.putParcelableArrayList(EXTRA_MOVIES_KEY, moviesAdapter.getMovies());
         outState.putParcelable(EXTRA_LAYOUT_MANAGER_KEY, binding.recyclerView.getLayoutManager().onSaveInstanceState());
+        outState.putInt(EXTRA_YEAR_KEY, presenter.getYear());
     }
 
     @Override
@@ -80,16 +89,35 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_filter:
-                DatePickerFragment.show(getSupportFragmentManager());
+                presenter.filterClicked();
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    // MainContract.View
+
     @Override
-    public void addMovie(Movie movie) {
-        moviesAdapter.addMovie(movie);
+    public void setMovies(List<Movie> movies) {
+        moviesAdapter.setMovies(movies);
         moviesAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void showYear(int year) {
+        getSupportActionBar().setTitle(getString(R.string.title_filter, year));
+    }
+
+    @Override
+    public void showDatePicker(int year) {
+        DatePickerFragment.show(getSupportFragmentManager(), year);
+    }
+
+    // DatePickerFragment.OnDatePicked
+
+    @Override
+    public void onYearPicked(int year) {
+        presenter.yearPicked(year);
     }
 
     private AppComponent getAppComponent() {
@@ -128,12 +156,13 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             return movies.size();
         }
 
-        void addMovie(Movie movie) {
-            movies.add(movie);
-        }
-
         ArrayList<Movie> getMovies() {
             return movies;
+        }
+
+        void setMovies(List<Movie> movies) {
+            this.movies.clear();
+            this.movies.addAll(movies);
         }
     }
 

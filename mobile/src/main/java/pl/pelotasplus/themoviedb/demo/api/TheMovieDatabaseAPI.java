@@ -7,7 +7,8 @@ import rx.Observable;
 public interface TheMovieDatabaseAPI {
     @GET("/3/discover/movie?sort_by=primary_release_date.desc")
     Observable<MoviesResponse> discoverMovie(
-            @Query("primary_release_date.lte") String release_date_lte,
-            @Query("page") int page
+            @Query("page") int page,
+            @Query("primary_release_date.gte") String release_date_gte,
+            @Query("primary_release_date.lte") String release_date_lte
     );
 }

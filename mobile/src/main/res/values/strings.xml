@@ -4,4 +4,5 @@
     <string name="year_dialog_title">Select Year</string>
     <string name="year_dialog_message">Show only movies released in a particular year</string>
     <string name="cancel">Cancel</string>
+    <string name="title_filter">Year filter: %d</string>
 </resources>
