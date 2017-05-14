@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'groovyx.android'
 
 android {
     compileSdkVersion 25
@@ -65,9 +66,21 @@ dependencies {
     annotationProcessor 'com.ryanharter.auto.value:auto-value-gson:0.4.6'
     provided 'com.ryanharter.auto.value:auto-value-gson:0.4.6'
 
-    testCompile 'junit:junit:4.12'
+    testCompile 'org.codehaus.groovy:groovy:2.4.3:grooid'
+    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+    testCompile 'org.objenesis:objenesis:2.2'
+    testCompile 'cglib:cglib-nodep:3.2.2'
 
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+}
+
+// Groovy plugins is not working with DataBinding class generator.
+// Groovy is used only for tests so there is no harm to just disable some tasks from build chain.
+afterEvaluate {
+    tasks.findAll { it.name.endsWith("Groovyc") }.findAll { !it.name.contains("Unit") }.each {
+        println "Disabling " + it
+        it.enabled = false
+    }
 }
