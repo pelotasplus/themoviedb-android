@@ -56,6 +56,11 @@ class MainPresenter implements MainContract.Presenter {
         view.showDatePicker(year);
     }
 
+    @Override
+    public void refresh() {
+        fetchMovies(null);
+    }
+
     private void fetchMovies(ArrayList<Movie> savedInstanceState) {
         view.showYear(year);
 
@@ -80,9 +85,11 @@ class MainPresenter implements MainContract.Presenter {
         }
 
         Subscription sub = movieObservable
+                .doOnSubscribe(() -> view.showRefreshing())
+                .doOnUnsubscribe(() -> view.hideRefreshing())
                 .subscribe(
                         view::setMovies,
-                        Throwable::printStackTrace
+                        view::showRefreshingError
                 );
         compositeSubscription.add(sub);
     }

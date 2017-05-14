@@ -5,4 +5,5 @@
     <string name="year_dialog_message">Show only movies released in a particular year</string>
     <string name="cancel">Cancel</string>
     <string name="title_filter">Year filter: %d</string>
+    <string name="error_loading">Error while refreshing: %s</string>
 </resources>

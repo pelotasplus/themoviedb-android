@@ -12,6 +12,12 @@ interface MainContract {
         void setMovies(List<Movie> movies);
 
         void showDatePicker(int year);
+
+        void hideRefreshing();
+
+        void showRefreshingError(Throwable throwable);
+
+        void showRefreshing();
     }
 
     interface Presenter {
@@ -24,5 +30,7 @@ interface MainContract {
         int getYear();
 
         void filterClicked();
+
+        void refresh();
     }
 }

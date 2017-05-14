@@ -2,6 +2,7 @@ package pl.pelotasplus.themoviedb.demo.screens.main;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -41,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements
 
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         binding.recyclerView.setAdapter(moviesAdapter);
+
+        binding.refreshLayout.setOnRefreshListener(() -> presenter.refresh());
 
         presenter = new MainPresenter(getAppComponent().getTheMovieDatabaseAPI());
 
@@ -111,6 +114,27 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void showDatePicker(int year) {
         DatePickerFragment.show(getSupportFragmentManager(), year);
+    }
+
+    @Override
+    public void hideRefreshing() {
+        binding.refreshLayout.setRefreshing(false);
+    }
+
+    @Override
+    public void showRefreshingError(Throwable throwable) {
+        Snackbar
+                .make(
+                        binding.refreshLayout,
+                        getString(R.string.error_loading, throwable.getMessage()),
+                        Snackbar.LENGTH_LONG
+                )
+                .show();
+    }
+
+    @Override
+    public void showRefreshing() {
+        binding.refreshLayout.setRefreshing(true);
     }
 
     // DatePickerFragment.OnDatePicked
