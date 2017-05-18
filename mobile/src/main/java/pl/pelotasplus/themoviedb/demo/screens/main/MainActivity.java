@@ -23,6 +23,8 @@ import pl.pelotasplus.themoviedb.demo.databinding.ActivityMainBinding;
 import pl.pelotasplus.themoviedb.demo.databinding.ViewMovieRowBinding;
 import pl.pelotasplus.themoviedb.demo.di.AppComponent;
 import pl.pelotasplus.themoviedb.demo.screens.details.DetailsActivity;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements
         MainContract.View, DatePickerFragment.OnDatePicked {
@@ -45,7 +47,11 @@ public class MainActivity extends AppCompatActivity implements
 
         binding.refreshLayout.setOnRefreshListener(() -> presenter.refresh());
 
-        presenter = new MainPresenter(getAppComponent().getTheMovieDatabaseAPI());
+        presenter = new MainPresenter(
+                getAppComponent().getTheMovieDatabaseAPI(),
+                AndroidSchedulers.mainThread(),
+                Schedulers.io()
+        );
 
         ArrayList<Movie> savedMovies = null;
         int savedYear = Calendar.getInstance().get(Calendar.YEAR);

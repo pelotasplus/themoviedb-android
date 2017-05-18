@@ -7,9 +7,8 @@ import java.util.Locale;
 import pl.pelotasplus.themoviedb.demo.api.Movie;
 import pl.pelotasplus.themoviedb.demo.api.TheMovieDatabaseAPI;
 import rx.Observable;
+import rx.Scheduler;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 class MainPresenter implements MainContract.Presenter {
@@ -19,9 +18,13 @@ class MainPresenter implements MainContract.Presenter {
 
     private int page = 1;
     private int year;
+    private Scheduler subscribeOn;
+    private Scheduler observeOn;
 
-    MainPresenter(TheMovieDatabaseAPI theMovieDatabaseAPI) {
+    MainPresenter(TheMovieDatabaseAPI theMovieDatabaseAPI, Scheduler observeOn, Scheduler subscribeOn) {
         this.theMovieDatabaseAPI = theMovieDatabaseAPI;
+        this.observeOn = observeOn;
+        this.subscribeOn = subscribeOn;
     }
 
     @Override
@@ -76,9 +79,8 @@ class MainPresenter implements MainContract.Presenter {
                             moviesResponse ->
                                     Observable.just(moviesResponse.getResults())
                     )
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread());
-
+                    .subscribeOn(subscribeOn)
+                    .observeOn(observeOn);
         } else {
             movieObservable = Observable
                     .just(savedInstanceState);
