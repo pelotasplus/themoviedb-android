@@ -16,6 +16,14 @@ public abstract class Movie implements Parcelable {
         return new AutoValue_Movie.GsonTypeAdapter(gson);
     }
 
+    public static Movie create(
+            String posterPath, boolean adult, String overview, String releaseDate,
+            List<Integer> genreIds, int id, String originalTitle, String originalLanguage,
+            String title, float popularity, int voteCount, boolean video, float voteAverage) {
+        return new AutoValue_Movie(posterPath, adult, overview, releaseDate, genreIds, id,
+                originalTitle, originalLanguage, title, popularity, voteCount, video, voteAverage);
+    }
+
     @Nullable
     @SerializedName("poster_path")
     public abstract String posterPath();
