@@ -6,8 +6,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.squareup.picasso.Picasso;
-
+import pl.pelotasplus.themoviedb.demo.MovieViewModel;
 import pl.pelotasplus.themoviedb.demo.R;
 import pl.pelotasplus.themoviedb.demo.api.Movie;
 import pl.pelotasplus.themoviedb.demo.databinding.ActivityDetailsBinding;
@@ -44,12 +43,6 @@ public class DetailsActivity extends AppCompatActivity implements DetailsContrac
 
     @Override
     public void showMovieDetails(Movie movie) {
-        binding.title.setText(movie.title());
-        binding.overview.setText(movie.overview());
-        binding.releaseDate.setText(movie.releaseDate());
-        Picasso
-                .with(this)
-                .load("https://image.tmdb.org/t/p/w500/" + movie.posterPath())
-                .into(binding.poster);
+        binding.setViewModel(new MovieViewModel(movie));
     }
 }

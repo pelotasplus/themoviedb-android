@@ -17,6 +17,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import pl.pelotasplus.themoviedb.demo.MobileApplication;
+import pl.pelotasplus.themoviedb.demo.MovieViewModel;
 import pl.pelotasplus.themoviedb.demo.R;
 import pl.pelotasplus.themoviedb.demo.api.Movie;
 import pl.pelotasplus.themoviedb.demo.databinding.ActivityMainBinding;
@@ -173,9 +174,7 @@ public class MainActivity extends AppCompatActivity implements
         public void onBindViewHolder(MovieViewHolder holder, int position) {
             Movie movie = movies.get(position);
 
-            holder.binding.title.setText(movie.title());
-            holder.binding.overview.setText(movie.overview());
-            holder.binding.releaseDate.setText(movie.releaseDate());
+            holder.binding.setViewModel(new MovieViewModel(movie));
 
             holder.binding.getRoot().setOnClickListener(v ->
                     DetailsActivity.showActivity(holder.binding.getRoot().getContext(), movie));
