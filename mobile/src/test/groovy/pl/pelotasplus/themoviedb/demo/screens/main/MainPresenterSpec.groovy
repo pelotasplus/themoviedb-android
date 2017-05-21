@@ -11,6 +11,7 @@ class MainPresenterSpec extends Specification {
     MainContract.View view = Mock();
     TheMovieDatabaseAPI theMovieDatabaseAPI = Mock()
     def year = 2017
+    def page = 4
     def subscribeOn = new TestScheduler()
     def observeOn = new TestScheduler()
 
@@ -27,7 +28,7 @@ class MainPresenterSpec extends Specification {
         theMovieDatabaseAPI.discoverMovie(_, _, _) >> Observable.empty()
 
         when:
-        presenter.bind(view, null, year)
+        presenter.bind(view, null, year, page)
 
         then:
         presenter.@view == view
@@ -38,7 +39,7 @@ class MainPresenterSpec extends Specification {
         theMovieDatabaseAPI.discoverMovie(_, _, _) >> Observable.empty()
 
         when:
-        presenter.bind(view, null, year)
+        presenter.bind(view, null, year, page)
 
         then:
         presenter.@year == year
@@ -53,22 +54,22 @@ class MainPresenterSpec extends Specification {
         )
 
         when:
-        presenter.bind(view, null, year)
+        presenter.bind(view, null, year, page)
 
         and:
         subscribeOn.triggerActions()
         observeOn.triggerActions()
 
         then:
-        1 * view.setMovies(moviesList)
+        1 * view.addMovies(moviesList)
     }
 
     def "should restore saved movies on bind"() {
         when:
-        presenter.bind(view, moviesList, year)
+        presenter.bind(view, moviesList, year, page)
 
         then:
-        1 * view.setMovies(moviesList)
+        1 * view.addMovies(moviesList)
     }
 
     def "should clean subscriptions on unbind"() {
@@ -80,7 +81,7 @@ class MainPresenterSpec extends Specification {
         )
 
         when:
-        presenter.bind(view, null, year)
+        presenter.bind(view, null, year, page)
 
         and:
         subscribeOn.triggerActions()
@@ -97,7 +98,7 @@ class MainPresenterSpec extends Specification {
 
     def "should remove view reference on unbind"() {
         given:
-        presenter.bind(view, moviesList, year)
+        presenter.bind(view, moviesList, year, page)
 
         when:
         presenter.unbind()
