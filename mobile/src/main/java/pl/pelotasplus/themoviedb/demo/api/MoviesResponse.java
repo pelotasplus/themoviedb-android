@@ -19,4 +19,12 @@ public class MoviesResponse extends BaseResponse {
     public List<Movie> getResults() {
         return results;
     }
+
+    public int getPage() {
+        return page;
+    }
+
+    public int getTotalPages() {
+        return totalPages;
+    }
 }

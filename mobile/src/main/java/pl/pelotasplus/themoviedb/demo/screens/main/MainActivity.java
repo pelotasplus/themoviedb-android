@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import pl.pelotasplus.themoviedb.demo.MobileApplication;
 import pl.pelotasplus.themoviedb.demo.MovieViewModel;
@@ -24,6 +25,7 @@ import pl.pelotasplus.themoviedb.demo.databinding.ActivityMainBinding;
 import pl.pelotasplus.themoviedb.demo.databinding.ViewMovieRowBinding;
 import pl.pelotasplus.themoviedb.demo.di.AppComponent;
 import pl.pelotasplus.themoviedb.demo.screens.details.DetailsActivity;
+import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -31,11 +33,14 @@ public class MainActivity extends AppCompatActivity implements
         MainContract.View, DatePickerFragment.OnDatePicked {
     private final static String EXTRA_MOVIES_KEY = "MainActivity/EXTRA_MOVIES_KEY";
     private final static String EXTRA_YEAR_KEY = "MainActivity/EXTRA_YEAR_KEY";
+    private final static String EXTRA_PAGE_KEY = "MainActivity/EXTRA_PAGE_KEY";
     private final static String EXTRA_LAYOUT_MANAGER_KEY = "MainActivity/EXTRA_LAYOUT_MANAGER_KEY";
+    private final static int LOAD_MORE_THRESHOLD = 5;
 
     private final MoviesAdapter moviesAdapter = new MoviesAdapter();
     private MainPresenter presenter;
     private ActivityMainBinding binding;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +50,12 @@ public class MainActivity extends AppCompatActivity implements
 
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         binding.recyclerView.setAdapter(moviesAdapter);
+        binding.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                loadMoreIfNeeded(recyclerView);
+            }
+        });
 
         binding.refreshLayout.setOnRefreshListener(() -> presenter.refresh());
 
@@ -56,13 +67,27 @@ public class MainActivity extends AppCompatActivity implements
 
         ArrayList<Movie> savedMovies = null;
         int savedYear = Calendar.getInstance().get(Calendar.YEAR);
+        int savedPage = 1;
 
         if (savedInstanceState != null) {
             savedMovies = savedInstanceState.getParcelableArrayList(EXTRA_MOVIES_KEY);
             savedYear = savedInstanceState.getInt(EXTRA_YEAR_KEY);
+            savedPage = savedInstanceState.getInt(EXTRA_PAGE_KEY);
         }
 
-        presenter.bind(this, savedMovies, savedYear);
+        presenter.bind(this, savedMovies, savedYear, savedPage);
+    }
+
+    private void loadMoreIfNeeded(RecyclerView recyclerView) {
+        int visibleItemCount = recyclerView.getChildCount();
+        int totalItemCount = recyclerView.getLayoutManager().getItemCount();
+        int firstVisibleItemPosition = ((LinearLayoutManager) recyclerView.getLayoutManager())
+                .findFirstVisibleItemPosition();
+
+        if ((totalItemCount - visibleItemCount) <= (firstVisibleItemPosition + LOAD_MORE_THRESHOLD)
+                || totalItemCount == 0) {
+            presenter.loadMore();
+        }
     }
 
     @Override
@@ -86,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements
         outState.putParcelableArrayList(EXTRA_MOVIES_KEY, moviesAdapter.getMovies());
         outState.putParcelable(EXTRA_LAYOUT_MANAGER_KEY, binding.recyclerView.getLayoutManager().onSaveInstanceState());
         outState.putInt(EXTRA_YEAR_KEY, presenter.getYear());
+        outState.putInt(EXTRA_PAGE_KEY, presenter.getPage());
     }
 
     @Override
@@ -108,8 +134,14 @@ public class MainActivity extends AppCompatActivity implements
     // MainContract.View
 
     @Override
-    public void setMovies(List<Movie> movies) {
-        moviesAdapter.setMovies(movies);
+    public void addMovies(List<Movie> movies) {
+        moviesAdapter.addMovies(movies);
+        moviesAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void clearMovies() {
+        moviesAdapter.clearMovies();
         moviesAdapter.notifyDataSetChanged();
     }
 
@@ -125,7 +157,10 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void hideRefreshing() {
-        binding.refreshLayout.setRefreshing(false);
+        Observable
+                .timer(1000, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(next -> binding.refreshLayout.setRefreshing(false));
     }
 
     @Override
@@ -189,9 +224,12 @@ public class MainActivity extends AppCompatActivity implements
             return movies;
         }
 
-        void setMovies(List<Movie> movies) {
-            this.movies.clear();
+        void addMovies(List<Movie> movies) {
             this.movies.addAll(movies);
+        }
+
+        void clearMovies() {
+            this.movies.clear();
         }
     }
 

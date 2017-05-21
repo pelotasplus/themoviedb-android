@@ -16,10 +16,12 @@ class MainPresenter implements MainContract.Presenter {
     private final CompositeSubscription compositeSubscription = new CompositeSubscription();
     private MainContract.View view;
 
+    private int totalPages = Integer.MAX_VALUE;
     private int page = 1;
     private int year;
     private Scheduler subscribeOn;
     private Scheduler observeOn;
+    private boolean isLoading = false;
 
     MainPresenter(TheMovieDatabaseAPI theMovieDatabaseAPI, Scheduler observeOn, Scheduler subscribeOn) {
         this.theMovieDatabaseAPI = theMovieDatabaseAPI;
@@ -28,9 +30,10 @@ class MainPresenter implements MainContract.Presenter {
     }
 
     @Override
-    public void bind(MainContract.View view, ArrayList<Movie> savedInstanceState, int year) {
+    public void bind(MainContract.View view, ArrayList<Movie> savedInstanceState, int year, int page) {
         this.view = view;
         this.year = year;
+        this.page = page;
 
         fetchMovies(savedInstanceState);
     }
@@ -46,6 +49,8 @@ class MainPresenter implements MainContract.Presenter {
     public void yearPicked(int year) {
         this.year = year;
 
+        resetMoviesAndState();
+
         fetchMovies(null);
     }
 
@@ -55,16 +60,37 @@ class MainPresenter implements MainContract.Presenter {
     }
 
     @Override
+    public int getPage() {
+        return page;
+    }
+
+    @Override
     public void filterClicked() {
         view.showDatePicker(year);
     }
 
     @Override
     public void refresh() {
+        resetMoviesAndState();
+
         fetchMovies(null);
     }
 
+    @Override
+    public void loadMore() {
+        fetchMovies(null);
+    }
+
+    private void resetMoviesAndState() {
+        this.page = 1;
+        this.totalPages = Integer.MAX_VALUE;
+        view.clearMovies();
+    }
+
     private void fetchMovies(ArrayList<Movie> savedInstanceState) {
+        if (isLoading) return;
+        if (page > totalPages) return;
+
         view.showYear(year);
 
         Observable<List<Movie>> movieObservable;
@@ -76,8 +102,11 @@ class MainPresenter implements MainContract.Presenter {
             movieObservable = theMovieDatabaseAPI
                     .discoverMovie(page, dateFrom, dateTo)
                     .flatMap(
-                            moviesResponse ->
-                                    Observable.just(moviesResponse.getResults())
+                            moviesResponse -> {
+                                page = moviesResponse.getPage() + 1;
+                                totalPages = moviesResponse.getTotalPages();
+                                return Observable.just(moviesResponse.getResults());
+                            }
                     )
                     .subscribeOn(subscribeOn)
                     .observeOn(observeOn);
@@ -87,10 +116,18 @@ class MainPresenter implements MainContract.Presenter {
         }
 
         Subscription sub = movieObservable
-                .doOnSubscribe(() -> view.showRefreshing())
-                .doOnUnsubscribe(() -> view.hideRefreshing())
+                .doOnSubscribe(() -> {
+                    isLoading = true;
+                    view.showRefreshing();
+                })
+                .doOnUnsubscribe(() -> {
+                    isLoading = false;
+                })
                 .subscribe(
-                        view::setMovies,
+                        movies -> {
+                            view.addMovies(movies);
+                            view.hideRefreshing();
+                        },
                         view::showRefreshingError
                 );
         compositeSubscription.add(sub);

@@ -9,8 +9,6 @@ interface MainContract {
     interface View {
         void showYear(int year);
 
-        void setMovies(List<Movie> movies);
-
         void showDatePicker(int year);
 
         void hideRefreshing();
@@ -18,10 +16,14 @@ interface MainContract {
         void showRefreshingError(Throwable throwable);
 
         void showRefreshing();
+
+        void addMovies(List<Movie> movies);
+
+        void clearMovies();
     }
 
     interface Presenter {
-        void bind(View view, ArrayList<Movie> savedInstanceState, int year);
+        void bind(View view, ArrayList<Movie> savedInstanceState, int year, int page);
 
         void unbind();
 
@@ -32,5 +34,9 @@ interface MainContract {
         void filterClicked();
 
         void refresh();
+
+        void loadMore();
+
+        int getPage();
     }
 }
