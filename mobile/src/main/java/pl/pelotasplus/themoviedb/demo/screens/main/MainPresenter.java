@@ -89,7 +89,7 @@ class MainPresenter implements MainContract.Presenter {
 
     private void fetchMovies(ArrayList<Movie> savedInstanceState) {
         if (isLoading) return;
-        if (page > totalPages) return;
+        if (page >= totalPages) return;
 
         view.showYear(year);
 
